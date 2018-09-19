@@ -1,1 +1,1 @@
-# Minimal Openshift Provisioner
+# Openshift Provisioner
