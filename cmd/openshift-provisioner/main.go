@@ -13,23 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package provisioner
+package main
 
 import (
-	"gitlab.cee.redhat.com/service/uhc-clusters-service/pkg/api"
-	"k8s.io/client-go"
-	"os/exec"
+	"flag"
+	"log"
+	"time"
+
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
+
+	"github.com/nimrodshn/openshift-provisioner/pkg/api/clientset/v1alpha1"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
-// ClustersProvisioner is a minial openshift provisioner using Openshift Ansible.
-type ClustersProvisioner struct{}
-
-// Provision provisions an openshift cluster.
-func (p *ClustersProvisioner) Provision(api.Cluster) error {
-
-}
-
-// SetCredentials sets the appropriate credentials
-func (p *ClustersProvisioner) SetCredentials() error {
-
+func main() {
+	config, err = rest.InClusterConfig()
+	if err != nil {
+		panic(err)
+	}
+	clusterClient := v1alpha1.NewForConfig(config)
+	clusterController := NewController(clusterClient)
+	clusterController.Run(wait.NeverStop)
 }

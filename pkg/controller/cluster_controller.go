@@ -14,3 +14,33 @@
 // limitations under the License.
 
 package controller
+
+import (
+	"time"
+
+	client_v1alpha1 "github.com/nimrodshn/openshift-provisioner/pkg/api/clientset/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/nimrodshn/openshift-provisioner/pkg/api/types/v1alpha1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/tools/cache"
+)
+
+// NewController returns a new Controller.
+func NewController(clientset client_v1alpha1.ClusterInterface, namespace string) cache.Controller {
+	_, clusterController := cache.NewSharedIndexInformer(
+		&cache.ListWatch{
+			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
+				return clientset.Cluster(namespace).List(options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return clientset.Cluster(namespace).Watch(options)
+			},
+		},
+		&v1alpha.Cluster{},
+		1*time.Minute,
+		cache.ResourceEventHandlerFuncs{},
+	)
+	return clusterController
+}
